@@ -82,6 +82,8 @@ p(w)  = p(w_1, w_2,...,w_n)
 * order 3 (trigram) model
 `p(^^rrssrs$) = p(r|^^) p(r|^r) p(s|rr) p(s|rs) p(r|ss) p(s|sr) p($|rs)`
 
+[code hack0]
+
 ## Estimating a Markov Model
 
 Suppose your data is:
@@ -112,3 +114,5 @@ p(^rs$) = p(r|^) p(s|r) p($|s)
         = 3/3    3/8    1/6
         = .0625
 ```
+
+[code hack1]
