@@ -24,9 +24,10 @@ p(x|y) = p(y|x) p(x) / p(y)   Bayes' rule
 ```
 
 ## Language Model
-
+```
 w                              sequence of words w_1, w_2,...,w_n
 p(w)                           a language model!
+```
 
 ## Why would a language model be useful?
 * Speech recognition ("recognize speech" vs "wreck a nice beach")
@@ -43,16 +44,20 @@ p(w)                           a language model!
 ## Weather Example
 
 * Seattle
-     | rain | sun
-rain | .5   | .5
-sun  | .9   | .1
+
+|      | rain | sun |
+| ---- | ---- | --- |
+| rain | .5   | .5  |
+| sun  | .9   | .1  |
 
 * Los Angeles
-     | rain | sun
-rain | .3   | .7
-sun  | .1   | .9
 
-* What would Provo's transition matrix look like?
+|      | rain | sun |
+| ---- | ---- | --- |
+| rain | .3   | .7  |
+| sun  | .1   | .9  |
+
+* Provo?
 
 ## Language Model using Markov Chains
 order     number of terms in the n-gram
@@ -70,13 +75,11 @@ p(w)  = p(w_1, w_2,...,w_n)
   * Useful? Yes!
 
 ## N-Gram Models
-order 1 (unigram) model
+* Order 1 (unigram) model
 `p(rrssrs) = p(r) p(r) p(s) p(s) p(r) p(s)`
-
-order 2 (bigram) model
+* Order 2 (bigram) model
 `p(^rrssrs$) = p(r|^) p(r|r) p(s|r) p(s|s) p(r|s) p(s|r) p($|s)`
-
-order 3 (trigram) model
+* order 3 (trigram) model
 `p(^^rrssrs$) = p(r|^^) p(r|^r) p(s|rr) p(s|rs) p(r|ss) p(s|sr) p($|rs)`
 
 ## Estimating a Markov Model
@@ -87,10 +90,23 @@ Suppose your data is:
 ^rrrsss$
 ^rsr$
 ```
-       | rain | sun | $   || total
-rain   | 3    | 3   | 2   || 8
-sun    | 2    | 3   | 1   || 6
-^      | 3    | 0   | 0   || 3
+
+Count of each transition
+
+|      | rain | sun | $ |
+| ---- | ---- | --- | - |
+| rain | 3    | 3   | 2 |
+| sun  | 2    | 3   | 1 |
+| ^    | 3    | 0   | 0 |
+
+Count of each context
+
+|      | total |
+| ---- | ----- |
+| rain | 8     |
+| sun  | 6     |
+| ^    | 3     |
+
 ```
 p(^rs$) = p(r|^) p(s|r) p($|s)
         = 3/3    3/8    1/6
