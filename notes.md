@@ -149,3 +149,15 @@ Given a model `p(w)` and test data `D` how do you validate?
   * Sequences -> Names
 
 [code hack3]
+
+## Cool Results
+
+* This one was harder than the others...sorry
+
+* Now that it works, try this!
+  * Play with the order. What happens?
+  * Try it with other datasets.
+
+## Final Product
+
+[namegen]
