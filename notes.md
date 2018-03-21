@@ -158,6 +158,43 @@ Given a model `p(w)` and test data `D` how do you validate?
   * Play with the order. What happens?
   * Try it with other datasets.
 
-## Final Product
+## Problem: Memorization
 
-[namegen]
+* High order learns patterns in the data
+* High order also memorizes the data
+
+## Solution: Smoothing
+
+Idea: artificially add information to prevent overfit
+
+* Additive (Laplace)
+* Backoff (Katz)
+* Interpolation (Jelinek-Mercer)
+* And many more...
+
+## Additive (Laplacian smoothing)
+
+Idea: pretend our counts are all higher than they really are
+
+* Simply add some small amount to each count
+* Small increments (<0) mean we trust our data
+* Large increments make distributions more uniform
+
+* Alternative: Good-Turning frequency estimation
+
+## Backoff (Katz's backoff)
+
+Idea: use high order model, but use smaller context when data is sparse
+
+* Set some threshold on counts (typically 0), above which we a high order model
+* At or below the threshold "backoff" to a lower order model
+* Usually used in conjunction with Good-Turning frequency estimation
+
+## Interpolation (Jelinek-Mercer smoothing)
+
+Idea: use linear interpolation between two models
+
+* Typically one model is high order, and other is low order
+* Low order model defined recursively, so it is also an interpolated model
+
+[demo namegen]

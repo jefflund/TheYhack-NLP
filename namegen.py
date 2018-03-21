@@ -18,21 +18,21 @@ def sample_categorical(distribution):
 
 
 class MarkovModel(object):
-    """A simple n-gram language model"""
+    """A simple n-gram language model."""
 
-    def __init__(self, data, order=2, prefix='^', suffix='$'):
+    def __init__(self, data, order=2, prefix='^', suffix='$', prior=1e-10):
+        assert order > 0
         self.n = order - 1
         self.prefix = prefix * self.n
         self.suffix = suffix
+        self.prior = 1e-10
 
-        # TODO Add something which tracks all event types
-        # Hints
-        #   Use a set, and just add each event as you see them
-
+        self.alphabet = set()
         self.table = collections.Counter()
         self.margin = collections.Counter()
         for sequence in data:
             for event, context in self.extract_ngrams(sequence):
+                self.alphabet.add(event)
                 self.table[event, context] += 1
                 self.margin[context] += 1
 
@@ -52,7 +52,7 @@ class MarkovModel(object):
         On the whiteboard, this was p(w_i|w_{i-1},...,w_{i-m}),
         where w_i is the event, and w_{i-1},...,w_{i-m} is the context.
         """
-        return self.table[event, context] / self.margin[context]
+        return (self.table[event, context] + self.prior) / (self.margin[context] + self.prior * len(self.alphabet))
 
     def prob(self, sequence):
         """Computes the probability of a sequence.
@@ -71,28 +71,47 @@ class MarkovModel(object):
         On the whiteboard, that is to say we sample from the distribution
         p(w_i|w_{i_1},...,w_{i-m}).
         """
-        # TODO Implement this!
-        # Hints
-        #   Use sample_categorical to sample from the conditional distribution
-        #   To build the distribution, use cond_prob for each possible event
-        #   To determine each event type, see the todo in the init
+        dist = {}
+        for event in self.alphabet:
+            dist[event] = self.cond_prob(event, context)
+        return sample_categorical(dist)
 
     def gen(self):
         """Samples a sequence by running the Markov process.
 
         On the whiteboard, that is to say we sample from the distribution p(w).
         """
-        # TODO Implement this!
-        # Hints
-        #   Generate each individual event in the sequence using cond_gen
-        #   Each call to cond_gen uses context which is the last n events
-        #   The first context should just be the prefix
-        #   Stop generating events when the suffix (stop symbol) is generated
-        #   Strip the prefix and suffix from the generated sequence
+        sequence = self.prefix
+        while not sequence.endswith(self.suffix):
+            sequence += self.cond_gen(sequence[len(sequence)-self.n:])
+        return sequence[len(self.prefix): -len(self.suffix)]
+
+
+class InterpolatedModel(MarkovModel):
+    """A MarkovModel with Jelinek-Mercer smoothing."""
+
+    def __init__(self, data, lambda_, order=2, prefix='^', suffix='$'):
+        assert order > 1
+        super().__init__(data, order, prefix, suffix)
+        self.lambda_ = lambda_
+        if order == 2:
+            self.lower = MarkovModel(data, order-1, prefix, suffix)
+        else:
+            self.lower = InterpolatedModel(data, lambda_, order-1, prefix, suffix)
+
+    def cond_prob(self, event, context):
+        """Computes the conditional probability of an even given context.
+
+        The conditonal probability is computed using Jelinek-Mercer smoothing
+        with a lower order model.
+        """
+        high = super().cond_prob(event, context)
+        low = self.lower.cond_prob(event, context[1:])
+        return high * self.lambda_ + low * (1-self.lambda_)
 
 
 # Hopefully this prints out some cool names!
 data = open('data/pokemon.txt').read().split('\n')
-model = MarkovModel(data, order=3)
+model = InterpolatedModel(data, .9, order=5)
 for _ in range(10):
     print(model.gen())
