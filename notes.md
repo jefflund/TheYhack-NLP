@@ -82,15 +82,22 @@ p(w)  = p(w_1, w_2,...,w_n)
 * order 3 (trigram) model
 `p(^^rrssrs$) = p(r|^^) p(r|^r) p(s|rr) p(s|rs) p(r|ss) p(s|sr) p($|rs)`
 
+
+Note: `^` and `$` are special start/end symbols respectively
+
 [code hack0]
 
 ## Estimating a Markov Model
 
+Given training data `D = <w^1, w^2,...>`, how do you estimate `p(w)`?
+
 Suppose your data is:
 ```
-^rssrr$
-^rrrsss$
-^rsr$
+D = <
+      ^rssrr$
+      ^rrrsss$
+      ^rsr$
+    >
 ```
 
 Count of each transition
@@ -116,3 +123,29 @@ p(^rs$) = p(r|^) p(s|r) p($|s)
 ```
 
 [code hack1]
+
+## Language Model Evaluation
+
+Given a model `p(w)` and test data `D` how do you validate?
+
+* Evaluate likelihood of the data:
+```
+  p(D) = \prod_{w \in D} p(w)`
+```
+* Computation is unsable, so use log-likelihood instead:
+``` 
+  log p(D) = \sum_{w \in D} log p(w)
+           = \sum_{w \in D} \sum_{w_i \in w} log p(w_i|w_{i-1},...,w_{i-m})
+```
+* Use log-likelihood to choose various parameters (e.g. order)
+
+[code hack2]
+
+## Proceedural Name Generator
+
+* We can sample from `p(w)`
+* Model doesn't care what the data is:
+  * Words -> Characters
+  * Sequences -> Names
+
+[code hack3]

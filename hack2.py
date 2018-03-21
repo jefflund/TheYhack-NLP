@@ -1,4 +1,5 @@
 import collections
+import math
 
 class MarkovModel(object):
     """A simple n-gram language model"""
@@ -8,11 +9,12 @@ class MarkovModel(object):
         self.prefix = prefix * self.n
         self.suffix = suffix
 
-        # TODO Save counts needed for cond_prob from data
-        # Hints:
-        #   Each sequence in the data can be split with extract_ngrams
-        #   You need both the transition counts and the context counts
-        #   Consider using collections.Counter for zero defaults
+        self.table = collections.Counter()
+        self.margin = collections.Counter()
+        for sequence in data:
+            for event, context in self.extract_ngrams(sequence):
+                self.table[event, context] += 1
+                self.margin[context] += 1
 
     def extract_ngrams(self, sequence):
         """Generates each n-gram from a sequence.
@@ -30,10 +32,7 @@ class MarkovModel(object):
         On the whiteboard, this was p(w_i|w_{i-1},...,w_{i-m}),
         where w_i is the event, and w_{i-1},...,w_{i-m} is the context.
         """
-        # TODO Implement this!
-        # Hints:
-        #   You'll need the counts saved in the model init
-        #   Make sure you handle the case of 0 transition counts
+        return self.table[event, context] / self.margin[context]
 
     def prob(self, sequence):
         """Computes the probability of a sequence.
@@ -46,17 +45,28 @@ class MarkovModel(object):
             prob *= self.cond_prob(event, context)
         return prob
 
+    def evaluate(self, test_data):
+        """Computes the log-likelihood of the data for a model."""
+        # TODO Implement this!
+        # Hints:
+        #   Remember the rule for log multiplication: log(a*b) = log(a) + log(b)
+        #   Use math.log to compute the log function
+
 
 def test_model():
-    # This is the data from the whiteboard. Your counts should match the board.
-    data = [
-        'rssrr',
-        'rrrsss',
-        'rsr',
-    ]
-    model = MarkovModel(data)
-    assert model.cond_prob('s', '^') == 0
-    assert model.cond_prob('r', '^') == 3/3
-    assert model.cond_prob('s', 'r') == 3/8
-    assert model.cond_prob('$', 's') == 1/6
-    assert model.prob('rs') == .0625
+    train_data = (
+        ('the', 'dog', 'ran'),
+        ('the', 'cat', 'ate'),
+        ('the', 'bat', 'flew'),
+        ('a', 'dog', 'ran'),
+        ('a', 'cat', 'ran'),
+        ('a', 'bat', 'ate'),
+    )
+    model = MarkovModel(train_data, prefix=('^',), suffix=('$',))
+
+    test_data = (
+        ('a', 'cat', 'ate'),
+        ('a', 'bat', 'flew'),
+        # ('a', 'cat', 'flew'),
+    )
+    assert model.evaluate(test_data) == -4.969813299576001
