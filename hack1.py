@@ -13,6 +13,12 @@ class MarkovModel(object):
         #   Each sequence in the data can be split with extract_ngrams
         #   You need both the transition counts and the context counts
         #   Consider using collections.Counter for zero defaults
+        self.table = collections.Counter()
+        self.margin = collections.Counter()
+        for sequence in data:
+            for event, context in self.extract_ngrams(sequence):
+                self.table[event, context] += 1
+                self.margin[context] += 1
 
     def extract_ngrams(self, sequence):
         """Generates each n-gram from a sequence.
@@ -33,7 +39,8 @@ class MarkovModel(object):
         # TODO Implement this!
         # Hints:
         #   You'll need the counts saved in the model init
-        #   Make sure you handle the case of 0 transition counts
+        #   Make sure you handle the case of zero counts
+        #   Don't overthink it! This could be a one liner :)
 
     def prob(self, sequence):
         """Computes the probability of a sequence.

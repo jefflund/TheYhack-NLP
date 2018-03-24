@@ -28,7 +28,6 @@ class MarkovModel(object):
         # TODO Add something which tracks all event types
         # Hints
         #   Use a set, and just add each event as you see them
-
         self.table = collections.Counter()
         self.margin = collections.Counter()
         for sequence in data:

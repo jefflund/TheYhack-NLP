@@ -35,6 +35,7 @@ class MarkovModel(object):
         # TODO Implement this!
         # Hints:
         #   You'll probably want to use extract_ngrams to split the sequence
+        #   extract_ngrams yields a sequence of (event, context) tuples
         #   For each n-gram, you'll want to use cond_prob in some way
 
 
