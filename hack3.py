@@ -90,6 +90,14 @@ class MarkovModel(object):
         #   Stop generating events when the suffix (stop symbol) is generated
         #   Strip the prefix and suffix from the generated sequence
 
+    def evaluate(self, test_data):
+        """Computes the log-likelihood of the data for a model."""
+        log_like = 0
+        for sequence in test_data:
+            for event, context in self.extract_ngrams(sequence):
+                log_like += math.log(self.cond_prob(event, context))
+        return log_like
+
 
 # Hopefully this prints out some cool names!
 data = open('data/pokemon.txt').read().split('\n')
